@@ -1,12 +1,9 @@
 package Server2; // Khai báo đúng gói Server2
 
-import java.net.*;
-import java.io.*;
-import java.util.Hashtable;
-
-// Import thư viện làm Web Server mini của Java
 import com.sun.net.httpserver.HttpServer;
-import java.net.InetSocketAddress;
+import java.io.*;
+import java.net.*;
+import java.util.Hashtable;
 
 public class Server2 {
 
@@ -83,7 +80,7 @@ public class Server2 {
                     MESSAGE = message;
                     String jeton;
                     
-                    Server2.log("Thông tin nhận được :\n" + "start: " + st + "\n" + "jeton: " + je + "\n"
+                    Server2.log("Thông nhận được :\n" + "start: " + st + "\n" + "jeton: " + je + "\n"
                             + "lamport: " + lamport + "\n" + "servername: " + name + "\n"
                             + "type: " + type + "\n" + "action: " + action + "\n" + "vòng đk: " + circle + "\n"
                             + "thông điệp: " + message + "\n");
@@ -375,6 +372,13 @@ public class Server2 {
                         start++;
                         try {
                             int tam = pos - 2;
+                            if (tam < 0) {
+                                tam = 2;
+                            }
+                            if (t.charAt(tam) == '0') {
+                                Server2.log("\nServer" + (tam + 1) + " bị sự cố do jeton nhận được là: " + t + ".\n\n");
+                                tam--;
+                            }
                             if (tam < 0) {
                                 tam = 2;
                             }
