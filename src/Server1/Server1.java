@@ -566,7 +566,7 @@ public class Server1 {
         // --- CHÈN WEB SERVER MINI (HIỂN THỊ LOG RA NGINX) ---
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext("/", exchange -> {
-            String response = "<html><head><meta charset='UTF-8'><meta http-equiv='refresh' content='2'></head>"
+            String response = "<html><head><meta charset='UTF-8'></head>"
                     + "<body style='background:#1e1e1e; color:#00ff00; font-family:monospace; padding:20px;'>"
                     + "<h2>MÁY CHỦ 1 - RẠP PHIM (Chạy trên Google Cloud)</h2>"
                     + "<div style='border:1px solid #444; padding:15px; height:80vh; overflow-y:auto;'>" 
