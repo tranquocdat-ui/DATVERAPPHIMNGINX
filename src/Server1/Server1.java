@@ -1,13 +1,9 @@
 package Server1; // CHÚ Ý: Khi chép sang Server 2, 3, 4, 5 thì nhớ sửa số gói (package) ở đây!
 
-import java.net.*;
-import java.io.*;
-import java.util.Hashtable;
-
-// Import thư viện làm Web Server mini của Java
 import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpExchange;
+import java.io.*;
+import java.net.*;
+import java.util.Hashtable;
 
 public class Server1 {
 
@@ -380,6 +376,13 @@ public class Server1 {
                             if (tam < 0) {
                                 tam = 2;
                             }
+                            if (t.charAt(tam) == '0') {
+                                Server1.log("\nServer" + (tam + 1) + " bị sự cố do jeton nhận được là: " + t + ".\n");
+                                tam--;
+                            }
+                            if (tam < 0) {
+                                tam = 2;
+                            }
                             Connect co = new Connect(rount.table[tam].destination, rount.table[tam].port,
                                     rount.table[tam].name);
                             co.connect();
@@ -418,17 +421,26 @@ public class Server1 {
                     Socket client = server.accept();
                     apps.handler(client, "Server1", 1, currentCircle, hash);
                     apps.runServer();
+                    
                     ProcessData data = new ProcessData(MESSAGE);
                     Database db = new Database();
-                    boolean ktradb = db.querySQL(data.getPos(), data.getNum(), data.getType(), data.getColor());
-                    if (ktradb == true) {
-                        if (data.getAct().equalsIgnoreCase("SET")) {
-                            db.insertData(data.getPos(), data.getNum(), data.getType(), data.getColor(),
-                                    data.getTime());
-                        } else if (data.getAct().equalsIgnoreCase("DEL")) {
+                    
+                    // ==========================================
+                    // 🔥 PHẦN LOGIC ĐÃ SỬA LỖI (Quan trọng nhất)
+                    // ==========================================
+                    if (data.getAct().equalsIgnoreCase("SET")) {
+                        // CHỈ ĐẶT VÉ khi kiểm tra đúng cái "Số ghế" đó ĐANG TRỐNG
+                        if (db.isEmpty(data.getPos())) {
+                            db.insertData(data.getPos(), data.getNum(), data.getType(), data.getColor(), data.getTime());
+                        }
+                    } else if (data.getAct().equalsIgnoreCase("DEL")) {
+                        // CHỈ HỦY VÉ khi kiểm tra "Số ghế" đó ĐÃ CÓ NGƯỜI ĐẶT
+                        if (!db.isEmpty(data.getPos())) {
                             db.delData(data.getPos());
                         }
                     }
+                    // ==========================================
+
                     currentCircle++;
                     hash.put(String.valueOf(currentCircle), MESSAGE);
 
