@@ -29,7 +29,7 @@ public class Database {
     // Đã đổi tham số sang chuẩn Rạp phim (soghe, tenkhach, loaive, thanhtoan, giodat)
     public void insertData(String soghe, String tenkhach, String loaive, String thanhtoan, String giodat) {
         // CHÚ Ý: Chép sang Server khác nhớ đổi chữ 'server1' thành 'server2', 'server3'...
-        String sSQL = "INSERT INTO server1 VALUES ('" + soghe + "','" + tenkhach + "','" + loaive + "','" + thanhtoan + "','" + giodat + "')";
+        String sSQL = "INSERT INTO server5 VALUES ('" + soghe + "','" + tenkhach + "','" + loaive + "','" + thanhtoan + "','" + giodat + "')";
         try {
             stmt.executeUpdate(sSQL);
         } catch (Exception e) {
@@ -40,7 +40,7 @@ public class Database {
     public void delData(String id) {
         try {
             // Hủy vé theo số ghế
-            String sSQL = "DELETE FROM server1 WHERE soghe='" + id + "'";
+            String sSQL = "DELETE FROM server5 WHERE soghe='" + id + "'";
             stmt.executeUpdate(sSQL);
         } catch (Exception e) {
             System.out.println("Lỗi Delete: " + e.getMessage());
@@ -71,7 +71,7 @@ public class Database {
     public boolean isEmpty(String id) {
         boolean check = true;
         try {
-            String sSQL = "SELECT soghe FROM server1 WHERE soghe='" + id + "'";
+            String sSQL = "SELECT soghe FROM server5 WHERE soghe='" + id + "'";
             rs = stmt.executeQuery(sSQL);
             if (rs.next()) {
                 check = false; // Nếu tìm thấy số ghế này trong DB nghĩa là đã bị đặt
@@ -85,7 +85,7 @@ public class Database {
     public boolean querySQL(String soghe, String tenkhach, String loaive, String thanhtoan) {
         boolean check = true;
         try {
-            String sSQL = "SELECT * FROM server1 WHERE soghe='" + soghe + "'"
+            String sSQL = "SELECT * FROM server5 WHERE soghe='" + soghe + "'"
                     + "AND tenkhach='" + tenkhach + "'"
                     + "AND loaive='" + loaive + "'"
                     + "AND thanhtoan='" + thanhtoan + "'";
