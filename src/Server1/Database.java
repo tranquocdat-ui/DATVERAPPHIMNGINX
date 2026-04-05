@@ -9,7 +9,7 @@ public class Database {
 
     // Đã nâng cấp Driver chuẩn cho MySQL đời mới để không bị lỗi kết nối
     String drivername = "com.mysql.cj.jdbc.Driver";
-    String connectionURL = "jdbc:mysql://localhost:3306/datve?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
+    String connectionURL = "jdbc:mysql://localhost:3306/db?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC";
     String username = "Tranquocdat";
     String password = "Tranquocdat435@";
     Statement stmt = null;
