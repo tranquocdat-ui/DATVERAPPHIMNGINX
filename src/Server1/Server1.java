@@ -1,4 +1,4 @@
-package Server1; // CHÚ Ý: Khi chép sang Server 2, 3, 4, 5 thì nhớ sửa số gói (package) ở đây!
+package Server1; // Khai báo đúng gói Server1
 
 import com.sun.net.httpserver.HttpServer;
 import java.io.*;
@@ -80,7 +80,7 @@ public class Server1 {
                     MESSAGE = message;
                     String jeton;
                     
-                    Server1.log("Thông tin nhận được :\n" + "start: " + st + "\n" + "jeton: " + je + "\n"
+                    Server1.log("Thông nhận được :\n" + "start: " + st + "\n" + "jeton: " + je + "\n"
                             + "lamport: " + lamport + "\n" + "servername: " + name + "\n"
                             + "type: " + type + "\n" + "action: " + action + "\n" + "vòng đk: " + circle + "\n"
                             + "thông điệp: " + message + "\n");
@@ -247,7 +247,6 @@ public class Server1 {
                             replyMessage = db1.getData();
                         }
 
-                        // Đã thay đổi thông báo lỗi cho phù hợp với Rạp phim
                         if ((message.endsWith("SET")) && (!db1.isEmpty(dt.getPos()))) {
                             replyMessage = "Lỗi: Ghế này đã có người đặt!";
                         }
@@ -377,7 +376,7 @@ public class Server1 {
                                 tam = 2;
                             }
                             if (t.charAt(tam) == '0') {
-                                Server1.log("\nServer" + (tam + 1) + " bị sự cố do jeton nhận được là: " + t + ".\n");
+                                Server1.log("\nServer" + (tam + 1) + " bị sự cố do jeton nhận được là: " + t + ".\n\n");
                                 tam--;
                             }
                             if (tam < 0) {
@@ -410,6 +409,7 @@ public class Server1 {
             Hashtable hash = new Hashtable();
 
             try {
+                // Đổi thành Server1 và Port 2001
                 GetState gs = new GetState("Server1");
                 gs.getCurrentCircle();
                 gs.sendUpdate("127.0.0.1", 2001, "Server1");
@@ -419,31 +419,31 @@ public class Server1 {
                     int localPort = server.getLocalPort();
                     Server1.log("Server 1 đang lắng nghe tại cổng " + localPort + ".\n");
                     Socket client = server.accept();
+                    
+                    // Gắn pos = 1 cho Server 1
                     apps.handler(client, "Server1", 1, currentCircle, hash);
                     apps.runServer();
                     
                     ProcessData data = new ProcessData(MESSAGE);
                     Database db = new Database();
-                    
-                    // ==========================================
-                    // 🔥 PHẦN LOGIC ĐÃ SỬA LỖI (Quan trọng nhất)
-                    // ==========================================
-                    if (data.getAct().equalsIgnoreCase("SET")) {
-                        // CHỈ ĐẶT VÉ khi kiểm tra đúng cái "Số ghế" đó ĐANG TRỐNG
-                        if (db.isEmpty(data.getPos())) {
-                            db.insertData(data.getPos(), data.getNum(), data.getType(), data.getColor(), data.getTime());
-                        }
-                    } else if (data.getAct().equalsIgnoreCase("DEL")) {
-                        // CHỈ HỦY VÉ khi kiểm tra "Số ghế" đó ĐÃ CÓ NGƯỜI ĐẶT
-                        if (!db.isEmpty(data.getPos())) {
-                            db.delData(data.getPos());
-                        }
+
+                    // ====================================================
+                    // SỬA LỖI: Tách điều kiện SET và DEL riêng biệt
+                    // querySQL trả về true = ghế trống, false = ghế đã có người
+                    // SET cần ghế trống  (ktradb == true)
+                    // DEL cần ghế có người (ktradb == false)
+                    // ====================================================
+                    boolean ktradb = db.querySQL(data.getPos(), data.getNum(), data.getType(), data.getColor());
+                    if (data.getAct().equalsIgnoreCase("SET") && ktradb == true) {
+                        db.insertData(data.getPos(), data.getNum(), data.getType(), data.getColor(), data.getTime());
+                        Server1.log("Đã thêm vé ghế " + data.getPos() + " vào database.\n");
+                    } else if (data.getAct().equalsIgnoreCase("DEL") && ktradb == false) {
+                        db.delData(data.getPos());
+                        Server1.log("Đã xóa vé ghế " + data.getPos() + " khỏi database.\n");
                     }
-                    // ==========================================
 
                     currentCircle++;
                     hash.put(String.valueOf(currentCircle), MESSAGE);
-
                 }
             } catch (IOException e) {
             }
@@ -566,7 +566,6 @@ public class Server1 {
         // --- CHÈN WEB SERVER MINI (HIỂN THỊ LOG RA NGINX) ---
         HttpServer server = HttpServer.create(new InetSocketAddress(8080), 0);
         server.createContext("/", exchange -> {
-            // Giao diện web hiển thị log, tự động làm mới sau mỗi 2 giây
             String response = "<html><head><meta charset='UTF-8'><meta http-equiv='refresh' content='2'></head>"
                     + "<body style='background:#1e1e1e; color:#00ff00; font-family:monospace; padding:20px;'>"
                     + "<h2>MÁY CHỦ 1 - RẠP PHIM (Chạy trên Google Cloud)</h2>"
@@ -583,7 +582,7 @@ public class Server1 {
         });
         server.start();
         
-        Server1.log("--- Hệ thống đã sẵn sàng ---\n");
+        Server1.log("--- Hệ thống Server 1 đã sẵn sàng ---\n");
         Server1.log("Web Monitor đang chạy tại cổng 8080...\n");
 
         // --- KHỞI CHẠY LOGIC SOCKET (Jeton) ---
